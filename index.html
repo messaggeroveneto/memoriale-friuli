@@ -21,7 +21,7 @@
     font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
     overflow:hidden;
 
-    /* “macerie”: pattern astratto (non foto) in trasparenza */
+    /* “macerie”: pattern astratto (non foto) */
     background-image:
       radial-gradient(900px 500px at 50% 0%, rgba(255,255,255,.08), transparent 60%),
       radial-gradient(900px 500px at 20% 85%, rgba(255,255,255,.06), transparent 55%),
@@ -30,14 +30,13 @@
     background-repeat: no-repeat, no-repeat, repeat;
   }
 
-  /* Barra ricerca */
+  /* Barra ricerca: nero pieno */
   header{
     position:sticky;
     top:0;
     z-index:20;
     padding:12px 14px;
-    background:rgba(11,12,16,.86);
-    backdrop-filter: blur(10px);
+    background:#000;                 /* <- nero pieno */
     border-bottom:1px solid var(--line);
     display:flex;
     gap:10px;
@@ -46,14 +45,14 @@
   }
   .brand{
     font-size:12px;
-    color:rgba(243,244,247,.72);
+    color:rgba(243,244,247,.75);
     letter-spacing:.2px;
     white-space:nowrap;
   }
   select,input,button{
     border-radius:12px;
     border:1px solid var(--line);
-    background:rgba(255,255,255,.04);
+    background:rgba(255,255,255,.06);
     color:var(--text);
     padding:10px 12px;
     outline:none;
@@ -61,7 +60,7 @@
   select{ padding-right:28px; }
   input{ flex:1; min-width:220px; }
   button{ cursor:pointer; }
-  button:hover{ background:rgba(255,255,255,.06); }
+  button:hover{ background:rgba(255,255,255,.09); }
 
   .wrap{
     position:relative;
@@ -153,7 +152,7 @@
 
   <select id="fieldSel" aria-label="Campo di ricerca">
     <option value="nome">Nome</option>
-    <option value="cognome" selected>Cognome</option>
+    <option value="cognome">Cognome</option>
     <option value="luogo">Luogo</option>
   </select>
 
@@ -188,7 +187,7 @@
   let VIEW = [];
   let page = 0;
 
-  // meno nomi per pagina, più sparsi
+  // 12 nomi per pagina
   const PAGE_SIZE = 12;
 
   function clamp(v,a,b){ return Math.max(a, Math.min(b, v)); }
@@ -203,7 +202,7 @@
       .replace(/\s+/g," ").trim();
   }
 
-  // RNG deterministico (layout stabile per pagina+query)
+  // RNG deterministico: layout stabile per pagina+query
   function mulberry32(seed){
     return function(){
       let t = seed += 0x6D2B79F5;
@@ -229,18 +228,6 @@
     render();
   }
 
-  function groupByCognome(list){
-    const map = new Map();
-    for(const r of list){
-      const k = r.cognome || "";
-      if(!map.has(k)) map.set(k, []);
-      map.get(k).push(r);
-    }
-    // ordina gruppi per cognome (stabile)
-    return [...map.entries()].sort((a,b)=> (a[0]||"").localeCompare(b[0]||"", "it"))
-      .map(([k, arr]) => ({ cognome:k, items: arr }));
-  }
-
   function render(){
     const totalPages = Math.max(1, Math.ceil(VIEW.length / PAGE_SIZE));
     page = clamp(page, 0, totalPages - 1);
@@ -248,118 +235,65 @@
     const start = page * PAGE_SIZE;
     const slice = VIEW.slice(start, start + PAGE_SIZE);
 
-    counter.textContent = `Pagina ${page+1}/${totalPages} • Nomi ${VIEW.length ? (start+1) : 0}-${Math.min(start+PAGE_SIZE, VIEW.length)} / ${VIEW.length}`;
+    counter.textContent =
+      `Pagina ${page+1}/${totalPages} • Nomi ${VIEW.length ? (start+1) : 0}-${Math.min(start+PAGE_SIZE, VIEW.length)} / ${VIEW.length}`;
 
     field.innerHTML = "";
 
     const W = field.clientWidth;
     const H = field.clientHeight;
-    const pad = 22;
+    const pad = 24;
 
-    // seed cambia con pagina+query+campo (layout “coerente”)
-    const seed = 12345 + page*99991 + norm(qEl.value).length*101 + (fieldSel.value.charCodeAt(0) || 0);
+    // seed: pagina + query + campo
+    const seed = 13579 + page*99991 + norm(qEl.value).length*131 + (fieldSel.value.charCodeAt(0) || 0);
     const rand = mulberry32(seed);
 
-    // Raggruppa per cognome: “isole” vicine
-    const groups = groupByCognome(slice);
-
-    // crea nodi prima per misurarli
-    const groupNodes = groups.map(g => {
-      const nodes = g.items.map(r => {
-        const div = document.createElement("div");
-        div.className = "tag";
-        div.innerHTML = `
-          <div class="name">${escapeHtml(r.nome)} ${escapeHtml(r.cognome)}</div>
-          <div class="place">${r.luogo ? "📍 " + escapeHtml(r.luogo) : ""}</div>
-        `;
-        // leggere variazioni
-        const s = 0.95 + rand()*0.10;
-        div.style.transform = `scale(${s.toFixed(3)})`;
-        field.appendChild(div);
-        return { div, r };
-      });
-      return { cognome: g.cognome, nodes };
-    });
-
-    // util overlap
+    // piazzamento “sparso” con tentativi anti-overlap
     const placed = [];
     function overlaps(a,b){
       return !(a.x+a.w < b.x || b.x+b.w < a.x || a.y+a.h < b.y || b.y+b.h < a.y);
     }
 
-    // 1) scegli un “centro” per ogni gruppo (cognome)
-    const centers = [];
-    const triesCenter = 80;
+    // crea nodi prima (serve per misurarli)
+    const nodes = slice.map(r => {
+      const div = document.createElement("div");
+      div.className = "tag";
+      div.innerHTML = `
+        <div class="name">${escapeHtml(r.nome)} ${escapeHtml(r.cognome)}</div>
+        <div class="place">${r.luogo ? "📍 " + escapeHtml(r.luogo) : ""}</div>
+      `;
+      // micro-variazione
+      const s = 0.95 + rand()*0.10;
+      div.style.transform = `scale(${s.toFixed(3)})`;
+      field.appendChild(div);
+      return div;
+    });
 
-    groupNodes.forEach((g, gi) => {
-      // dimensione media tag del gruppo
-      const avgW = g.nodes.reduce((s,n)=> s + n.div.getBoundingClientRect().width, 0) / g.nodes.length;
-      const avgH = g.nodes.reduce((s,n)=> s + n.div.getBoundingClientRect().height, 0) / g.nodes.length;
+    nodes.forEach(div => {
+      const rect = div.getBoundingClientRect();
+      const w = rect.width;
+      const h = rect.height;
 
       let best = null;
-      for(let t=0;t<triesCenter;t++){
-        // sparsi: scegli x/y in una zona ampia
-        const x = pad + rand()*(W - 2*pad);
-        const y = pad + rand()*(H - 2*pad);
+      for(let t=0;t<70;t++){
+        // distribuzione ampia (sparsa)
+        const x = pad + rand()*(W - 2*pad - w);
+        const y = pad + rand()*(H - 2*pad - h);
+        const cand = {x,y,w,h};
 
-        // area “virtuale” del cluster (più grande se più persone)
-        const radius = 14 + g.nodes.length * 18;
-        const cand = { x, y, w: avgW + radius*2, h: avgH + radius*2 };
-
-        // penalità per sovrapposizioni con altri cluster
         let pen = 0;
-        for(const c of centers){
-          if(overlaps({x:c.cx - c.w/2, y:c.cy - c.h/2, w:c.w, h:c.h},
-                      {x:cand.x - cand.w/2, y:cand.y - cand.h/2, w:cand.w, h:cand.h})) pen++;
-        }
+        for(const p of placed) if(overlaps(cand,p)) pen++;
+
         if(best === null || pen < best.pen){
-          best = { cx:x, cy:y, w:cand.w, h:cand.h, pen, radius };
+          best = { ...cand, pen };
           if(pen === 0) break;
         }
       }
-      centers.push(best);
-    });
 
-    // 2) posiziona i tag di ogni gruppo “intorno” al suo centro
-    groupNodes.forEach((g, gi) => {
-      const c = centers[gi];
-      const radius = c.radius;
+      div.style.left = Math.max(pad, Math.min(W - pad - best.w, best.x)) + "px";
+      div.style.top  = Math.max(pad, Math.min(H - pad - best.h, best.y)) + "px";
 
-      g.nodes.forEach((n, ni) => {
-        const rect = n.div.getBoundingClientRect();
-        const w = rect.width;
-        const h = rect.height;
-
-        // disposizione a spirale/cerchio
-        const angle = (ni / Math.max(1, g.nodes.length)) * Math.PI*2 + rand()*0.35;
-        const dist  = (g.nodes.length === 1) ? 0 : (8 + (ni % 3) * 18 + rand()*10);
-
-        let x = c.cx + Math.cos(angle) * Math.min(radius, 60) + (rand()*10 - 5) - w/2;
-        let y = c.cy + Math.sin(angle) * Math.min(radius, 60) + (rand()*10 - 5) - h/2;
-
-        // clamp dentro field
-        x = Math.max(pad, Math.min(W - pad - w, x));
-        y = Math.max(pad, Math.min(H - pad - h, y));
-
-        // piccoli tentativi anti-overlap con gli altri tag già piazzati
-        let placedRect = {x,y,w,h};
-        for(let t=0;t<30;t++){
-          let hit = false;
-          for(const p of placed){
-            if(overlaps(placedRect, p)){ hit = true; break; }
-          }
-          if(!hit) break;
-          // sposta un filo
-          x = Math.max(pad, Math.min(W - pad - w, x + (rand()*24 - 12)));
-          y = Math.max(pad, Math.min(H - pad - h, y + (rand()*24 - 12)));
-          placedRect = {x,y,w,h};
-        }
-
-        n.div.style.left = x + "px";
-        n.div.style.top  = y + "px";
-
-        placed.push(placedRect);
-      });
+      placed.push(best);
     });
   }
 
@@ -376,7 +310,7 @@
     }, 220);
   }
 
-  // Scroll pagina
+  // scroll pagina
   let wheelLock = false;
   window.addEventListener("wheel", (e) => {
     e.preventDefault();
@@ -386,7 +320,7 @@
     setTimeout(() => wheelLock = false, 280);
   }, { passive:false });
 
-  // Tastiera
+  // tastiera
   window.addEventListener("keydown", (e) => {
     if (e.key === "ArrowDown" || e.key === "PageDown" || e.key === " ") { e.preventDefault(); step(1); }
     if (e.key === "ArrowUp" || e.key === "PageUp") { e.preventDefault(); step(-1); }
@@ -394,7 +328,7 @@
     if (e.key === "End") { e.preventDefault(); page=999999; render(); }
   });
 
-  // Swipe
+  // swipe
   let startY = null;
   window.addEventListener("touchstart", (e) => {
     if (!e.touches || !e.touches.length) return;
@@ -409,7 +343,6 @@
     startY = null;
   }, { passive:true });
 
-  // CSV
   function parseCSV(text){
     const lines = text.trim().split(/\r?\n/);
     const sep = lines[0].includes(";") ? ";" : ",";
@@ -428,7 +361,6 @@
       const full = (nome + " " + cognome).trim();
       if(full) out.push({ nome, cognome, luogo });
     }
-    // ordinamento base: cognome, nome
     out.sort((a,b) => (a.cognome+" "+a.nome).localeCompare(b.cognome+" "+b.nome, "it"));
     return out;
   }
@@ -443,9 +375,8 @@
     ALL = parseCSV(text);
     VIEW = ALL.slice();
 
-    // event: ricerca
-    qEl.addEventListener("input", () => applyFilter());
-    fieldSel.addEventListener("change", () => applyFilter());
+    qEl.addEventListener("input", applyFilter);
+    fieldSel.addEventListener("change", applyFilter);
     resetBtn.addEventListener("click", () => {
       qEl.value = "";
       applyFilter();
