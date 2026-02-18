@@ -3,10 +3,10 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Memoriale – Terremoto del Friuli (1976)</title>
+<title>Memoriale – Friuli 1976</title>
 <style>
   :root{
-    --bg:#0b0c10;
+    --bg:#000;
     --text:#f3f4f7;
     --muted:rgba(243,244,247,.70);
     --line:rgba(255,255,255,.10);
@@ -20,40 +20,116 @@
     color:var(--text);
     font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
     overflow:hidden;
+
+    /* “polvere” bianca: puntinato leggero */
     background-image:
-      radial-gradient(900px 500px at 50% 0%, rgba(255,255,255,.08), transparent 60%),
-      radial-gradient(900px 500px at 20% 85%, rgba(255,255,255,.06), transparent 55%),
-      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220' viewBox='0 0 220 220'%3E%3Cg fill='%23ffffff' fill-opacity='.06'%3E%3Cpath d='M18 162l34-18 22 10-18 20z'/%3E%3Cpath d='M74 182l30-28 26 12-14 26z'/%3E%3Cpath d='M136 194l26-22 34 14-18 22z'/%3E%3Cpath d='M26 118l26-16 18 10-12 18z'/%3E%3Cpath d='M80 130l30-20 22 12-18 24z'/%3E%3Cpath d='M136 136l28-18 24 10-16 20z'/%3E%3Cpath d='M20 72l22-14 16 8-10 16z'/%3E%3Cpath d='M66 80l26-16 18 10-12 18z'/%3E%3Cpath d='M116 86l28-18 20 10-16 20z'/%3E%3Cpath d='M166 92l24-14 16 8-10 16z'/%3E%3C/g%3E%3Cg fill='none' stroke='%23ffffff' stroke-opacity='.05' stroke-width='2'%3E%3Cpath d='M10 205c55-28 75-28 120-10 40 16 60 10 80-2'/%3E%3Cpath d='M0 150c55-28 75-28 120-10 40 16 60 10 80-2'/%3E%3C/g%3E%3C/svg%3E");
-    background-size: auto, auto, 260px 260px;
-    background-repeat: no-repeat, no-repeat, repeat;
+      radial-gradient(circle at 12% 18%, rgba(255,255,255,.06) 1px, transparent 2px),
+      radial-gradient(circle at 72% 30%, rgba(255,255,255,.05) 1px, transparent 2px),
+      radial-gradient(circle at 44% 76%, rgba(255,255,255,.04) 1px, transparent 2px),
+      radial-gradient(circle at 86% 82%, rgba(255,255,255,.05) 1px, transparent 2px),
+      radial-gradient(circle at 20% 60%, rgba(255,255,255,.03) 1px, transparent 2px),
+      radial-gradient(900px 500px at 50% 0%, rgba(255,255,255,.08), transparent 60%);
+    background-size:
+      180px 180px,
+      220px 220px,
+      260px 260px,
+      240px 240px,
+      300px 300px,
+      auto;
   }
 
+  /* HEADER TOP (logo + testata + titolo) */
+  .hero{
+    padding:14px 14px 10px;
+    border-bottom:1px solid var(--line);
+    background: rgba(0,0,0,.80);
+    backdrop-filter: blur(10px);
+  }
+  .masthead{
+    display:flex;
+    align-items:center;
+    gap:10px;
+  }
+  .logo{
+    height:26px;
+    width:auto;
+    display:block;
+    filter: brightness(1.08) contrast(1.05);
+  }
+  .brand{
+    font-size:14px;
+    letter-spacing:.2px;
+    color:rgba(243,244,247,.88);
+    font-weight:650;
+  }
+  h1{
+    margin:10px 0 0;
+    font-size: clamp(18px, 2.2vw, 28px);
+    font-weight:750;
+    letter-spacing:.2px;
+  }
+
+  /* Barra ricerca: nera e compatta */
   header{
     position:sticky; top:0; z-index:20;
-    padding:12px 14px;
-    background:#000;
+    padding:10px 14px 12px;
+    background: rgba(0,0,0,.90);
+    backdrop-filter: blur(10px);
     border-bottom:1px solid var(--line);
     display:flex; gap:10px; align-items:center; flex-wrap:wrap;
   }
-  .brand{ font-size:12px; color:rgba(243,244,247,.75); letter-spacing:.2px; white-space:nowrap; }
+
+  /* controlli scuri */
   select,input,button{
     border-radius:12px;
     border:1px solid var(--line);
-    background:rgba(255,255,255,.06);
-    color:var(--text);
+    background: rgba(255,255,255,.06);
+    color: var(--text);
     padding:10px 12px;
     outline:none;
   }
-  select{ padding-right:28px; }
+
+  /* forza look scuro del select */
+  select{
+    padding-right:32px;
+    appearance:none;
+    -webkit-appearance:none;
+    -moz-appearance:none;
+    background-image:
+      linear-gradient(45deg, transparent 50%, rgba(243,244,247,.9) 50%),
+      linear-gradient(135deg, rgba(243,244,247,.9) 50%, transparent 50%),
+      linear-gradient(to right, transparent, transparent);
+    background-position:
+      calc(100% - 18px) 50%,
+      calc(100% - 12px) 50%,
+      0 0;
+    background-size: 6px 6px, 6px 6px, 100% 100%;
+    background-repeat:no-repeat;
+  }
+
+  /* prova a scurire le opzioni (dipende dal browser) */
+  select option{
+    background:#000;
+    color:#fff;
+  }
+
   input{ flex:1; min-width:220px; }
   button{ cursor:pointer; }
   button:hover{ background:rgba(255,255,255,.09); }
 
-  .wrap{ position:relative; height: calc(100vh - 58px); width:100%; }
+  .wrap{ position:relative; height: calc(100vh - 0px); width:100%; }
+  .content{
+    position:relative;
+    height: calc(100vh - 0px);
+  }
+
   .fade-out .stage{ opacity:0; transform: translateY(10px); }
   .stage{
-    position:absolute; inset:0; padding:16px;
-    opacity:1; transform: translateY(0);
+    position:absolute;
+    inset: calc(14px + 0px);
+    padding:16px;
+    opacity:1;
+    transform: translateY(0);
     transition: opacity 420ms ease, transform 420ms ease;
   }
 
@@ -68,7 +144,7 @@
     height: calc(100% - 34px);
     border:1px solid var(--line);
     border-radius:22px;
-    background: rgba(0,0,0,.20);
+    background: rgba(255,255,255,.02);
     overflow:hidden;
   }
 
@@ -87,14 +163,16 @@
     color:var(--text);
     font-weight:650;
     line-height:1.15;
-    font-size: clamp(14px, 4.2vw, 18px); /* mobile un po’ più grande */
+    font-size: clamp(14px, 4.2vw, 18px);
     letter-spacing:.2px;
     white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
   }
+  /* LUOGO: piccolo + corsivo, senza icona */
   .tag .place{
     margin-top:6px;
-    color:rgba(243,244,247,.70);
+    color:rgba(243,244,247,.72);
     font-size: clamp(11px, 3.4vw, 13px);
+    font-style: italic;
     white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
   }
 
@@ -111,9 +189,17 @@
 </head>
 <body>
 
-<header>
-  <div class="brand">Memoriale • Friuli 1976</div>
+<div class="hero">
+  <div class="masthead">
+    <img class="logo"
+         alt="messaggeroveneto"
+         src="https://socialcomitalia.com/wp-content/uploads/2022/07/Loghi-giornali-1920-%C3%97-480-px-12.png">
+    <div class="brand">messaggeroveneto</div>
+  </div>
+  <h1>Mille vittime, tutti i nomi.</h1>
+</div>
 
+<header>
   <select id="fieldSel" aria-label="Campo di ricerca">
     <option value="nome">Nome</option>
     <option value="cognome">Cognome</option>
@@ -150,12 +236,12 @@
   let VIEW = [];
   let page = 0;
 
-  // PAGE_SIZE responsive
+  // PAGE_SIZE responsive: desktop 12, tablet 8, mobile 5
   function getPageSize(){
     const w = window.innerWidth;
-    if (w <= 520) return 5;     // mobile
-    if (w <= 900) return 8;     // tablet
-    return 12;                  // desktop
+    if (w <= 520) return 5;
+    if (w <= 900) return 8;
+    return 12;
   }
   let PAGE_SIZE = getPageSize();
 
@@ -210,7 +296,6 @@
     const W = field.clientWidth;
     const H = field.clientHeight;
 
-    // padding più generoso su mobile per “sparsi”
     const pad = window.innerWidth <= 520 ? 28 : 24;
 
     const seed = 13579 + page*99991 + norm(qEl.value).length*131 + (fieldSel.value.charCodeAt(0) || 0) + PAGE_SIZE*17;
@@ -226,7 +311,7 @@
       div.className = "tag";
       div.innerHTML = `
         <div class="name">${escapeHtml(r.nome)} ${escapeHtml(r.cognome)}</div>
-        <div class="place">${r.luogo ? "📍 " + escapeHtml(r.luogo) : ""}</div>
+        <div class="place">${r.luogo ? escapeHtml(r.luogo) : ""}</div>
       `;
       const s = 0.95 + rand()*0.10;
       div.style.transform = `scale(${s.toFixed(3)})`;
@@ -241,7 +326,6 @@
 
       let best = null;
       for(let t=0;t<80;t++){
-        // più spazio: scegli posizioni su tutta l’area utile
         const x = pad + rand()*(W - 2*pad - w);
         const y = pad + rand()*(H - 2*pad - h);
         const cand = {x,y,w,h};
@@ -347,12 +431,11 @@
     page = 0;
     requestAnimationFrame(render);
 
-    // resize: aggiorna PAGE_SIZE e mantiene “posizione” nell’elenco
     window.addEventListener("resize", () => {
       const old = PAGE_SIZE;
       const nw = getPageSize();
       if (nw !== old){
-        const anchor = page * old;      // primo indice della pagina attuale
+        const anchor = page * old;
         PAGE_SIZE = nw;
         page = Math.floor(anchor / PAGE_SIZE);
       }
