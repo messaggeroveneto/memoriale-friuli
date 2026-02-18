@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Memoriale – Terremoto del Friuli (1976)</title>
+<style>
+  :root { --bg:#0b0c10; --text:#ececf2; --muted:#a9adbb; }
+  html,body{height:100%;}
+  body{ margin:0; background:var(--bg); color:var(--text);
+    font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif; overflow:hidden; }
+  .wrap{ height:100%; display:flex; align-items:center; justify-content:center; padding:18px; }
+  .card{ width:min(900px, 100%); text-align:center; padding:26px 18px; }
+  .name{ font-size: clamp(34px, 5vw, 68px); font-weight:700; line-height:1.05; letter-spacing:.2px;
+    opacity:1; transform: translateY(0); transition: opacity 420ms ease, transform 420ms ease; }
+  .place{ margin-top:14px; font-size: clamp(16px, 1.9vw, 22px); color:var(--muted);
+    opacity:1; transition: opacity 420ms ease; }
+  .fade-out .name{ opacity:0; transform: translateY(6px); }
+  .fade-out .place{ opacity:0; }
+  .hint{ position:fixed; left:14px; right:14px; bottom:12px; text-align:center;
+    color:rgba(169,173,187,.85); font-size:12px; pointer-events:none; }
+</style>
+</head>
+<body>
+
+<div class="wrap" id="wrap">
+  <div class="card">
+    <div class="name" id="name">Caricamento…</div>
+    <div class="place" id="place"></div>
+  </div>
+</div>
+<div class="hint" id="hint">Scroll • Frecce ↑ ↓ • Touch swipe</div>
+
+<script>
+const wrap = document.getElementById("wrap");
+const nameEl = document.getElementById("name");
+const placeEl = document.getElementById("place");
+const hintEl = document.getElementById("hint");
+
+let DATA = [];
+let idx = 0;
+
+function clamp(v,a,b){ return Math.max(a, Math.min(b, v)); }
+
+function render(){
+  const r = DATA[idx] || {n:"—", l:""};
+  nameEl.textContent = r.n || "—";
+  placeEl.textContent = r.l ? ("📍 " + r.l) : "";
+  hintEl.textContent = "Scroll • Frecce ↑ ↓ • Touch swipe • ("+(idx+1)+"/"+DATA.length+")";
+}
+
+function step(delta){
+  const next = clamp(idx + delta, 0, Math.max(0, DATA.length - 1));
+  if (next === idx) return;
+  wrap.classList.add("fade-out");
+  setTimeout(() => {
+    idx = next;
+    render();
+    requestAnimationFrame(() => wrap.classList.remove("fade-out"));
+  }, 220);
+}
+
+let wheelLock = false;
+window.addEventListener("wheel", (e) => {
+  e.preventDefault();
+  if (wheelLock) return;
+  wheelLock = true;
+  step(e.deltaY > 0 ? 1 : -1);
+  setTimeout(() => wheelLock = false, 260);
+}, { passive:false });
+
+window.addEventListener("keydown", (e) => {
+  if (e.key === "ArrowDown" || e.key === "PageDown" || e.key === " ") { e.preventDefault(); step(1); }
+  if (e.key === "ArrowUp" || e.key === "PageUp") { e.preventDefault(); step(-1); }
+  if (e.key === "Home") { idx=0; render(); }
+  if (e.key === "End") { idx=DATA.length-1; render(); }
+});
+
+let startY = null;
+window.addEventListener("touchstart", (e) => { if (!e.touches.length) return; startY = e.touches[0].clientY; }, { passive:true });
+window.addEventListener("touchend", (e) => {
+  if (startY == null) return;
+  const dy = e.changedTouches[0].clientY - startY;
+  if (Math.abs(dy) > 30) step(dy < 0 ? 1 : -1);
+  startY = null;
+}, { passive:true });
+
+function parseCSV(text){
+  const lines = text.trim().split(/\r?\n/);
+  const sep = lines[0].includes(";") ? ";" : ",";
+  const headers = lines.shift().split(sep).map(h => h.trim());
+  const iC = headers.findIndex(h => h.toLowerCase() === "cognome");
+  const iN = headers.findIndex(h => h.toLowerCase() === "nome");
+  const iL = headers.findIndex(h => h.toLowerCase() === "luogo");
+
+  const out = [];
+  for (const line of lines){
+    if(!line.trim()) continue;
+    const cells = line.split(sep).map(s => s.trim());
+    const nome = cells[iN] || "";
+    const cognome = cells[iC] || "";
+    const luogo = cells[iL] || "";
+    const full = (nome + " " + cognome).trim();
+    if(full) out.push({ n: full, l: luogo });
+  }
+  out.sort((a,b) => a.n.localeCompare(b.n, "it"));
+  return out;
+}
+
+async function load(){
+  const res = await fetch("Morti_Terremoto.csv", { cache:"no-store" });
+  const buf = await res.arrayBuffer();
+  let text;
+  try { text = new TextDecoder("iso-8859-1").decode(buf); }
+  catch { text = new TextDecoder("utf-8").decode(buf); }
+  DATA = parseCSV(text);
+  render();
+}
+load();
+</script>
+
+</body>
+</html>
