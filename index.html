@@ -10,8 +10,8 @@
     --text:#f3f4f7;
     --muted:rgba(243,244,247,.70);
     --line:rgba(255,255,255,.10);
-    --chip:rgba(255,255,255,.05);
-    --chipLine:rgba(255,255,255,.12);
+    --tile:rgba(255,255,255,.04);
+    --tileLine:rgba(255,255,255,.10);
   }
   html,body{height:100%;}
   body{
@@ -21,7 +21,7 @@
     font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
     overflow:hidden;
 
-    /* “polvere” bianca: puntinato leggero */
+    /* polvere bianca leggera */
     background-image:
       radial-gradient(circle at 12% 18%, rgba(255,255,255,.06) 1px, transparent 2px),
       radial-gradient(circle at 72% 30%, rgba(255,255,255,.05) 1px, transparent 2px),
@@ -29,47 +29,22 @@
       radial-gradient(circle at 86% 82%, rgba(255,255,255,.05) 1px, transparent 2px),
       radial-gradient(circle at 20% 60%, rgba(255,255,255,.03) 1px, transparent 2px),
       radial-gradient(900px 500px at 50% 0%, rgba(255,255,255,.08), transparent 60%);
-    background-size:
-      180px 180px,
-      220px 220px,
-      260px 260px,
-      240px 240px,
-      300px 300px,
-      auto;
+    background-size: 180px 180px,220px 220px,260px 260px,240px 240px,300px 300px,auto;
   }
 
-  /* HEADER TOP (logo + testata + titolo) */
+  /* HERO */
   .hero{
     padding:14px 14px 10px;
     border-bottom:1px solid var(--line);
     background: rgba(0,0,0,.80);
     backdrop-filter: blur(10px);
   }
-  .masthead{
-    display:flex;
-    align-items:center;
-    gap:10px;
-  }
-  .logo{
-    height:26px;
-    width:auto;
-    display:block;
-    filter: brightness(1.08) contrast(1.05);
-  }
-  .brand{
-    font-size:14px;
-    letter-spacing:.2px;
-    color:rgba(243,244,247,.88);
-    font-weight:650;
-  }
-  h1{
-    margin:10px 0 0;
-    font-size: clamp(18px, 2.2vw, 28px);
-    font-weight:750;
-    letter-spacing:.2px;
-  }
+  .masthead{ display:flex; align-items:center; gap:10px; }
+  .logo{ height:26px; width:auto; display:block; filter: brightness(1.08) contrast(1.05); }
+  .brand{ font-size:14px; letter-spacing:.2px; color:rgba(243,244,247,.88); font-weight:650; }
+  h1{ margin:10px 0 0; font-size: clamp(18px, 2.2vw, 28px); font-weight:750; letter-spacing:.2px; }
 
-  /* Barra ricerca: nera e compatta */
+  /* SEARCH BAR */
   header{
     position:sticky; top:0; z-index:20;
     padding:10px 14px 12px;
@@ -78,8 +53,6 @@
     border-bottom:1px solid var(--line);
     display:flex; gap:10px; align-items:center; flex-wrap:wrap;
   }
-
-  /* controlli scuri */
   select,input,button{
     border-radius:12px;
     border:1px solid var(--line);
@@ -88,90 +61,91 @@
     padding:10px 12px;
     outline:none;
   }
-
-  /* forza look scuro del select */
   select{
     padding-right:32px;
-    appearance:none;
-    -webkit-appearance:none;
-    -moz-appearance:none;
+    appearance:none; -webkit-appearance:none; -moz-appearance:none;
     background-image:
       linear-gradient(45deg, transparent 50%, rgba(243,244,247,.9) 50%),
       linear-gradient(135deg, rgba(243,244,247,.9) 50%, transparent 50%),
       linear-gradient(to right, transparent, transparent);
-    background-position:
-      calc(100% - 18px) 50%,
-      calc(100% - 12px) 50%,
-      0 0;
+    background-position: calc(100% - 18px) 50%, calc(100% - 12px) 50%, 0 0;
     background-size: 6px 6px, 6px 6px, 100% 100%;
     background-repeat:no-repeat;
   }
-
-  /* prova a scurire le opzioni (dipende dal browser) */
-  select option{
-    background:#000;
-    color:#fff;
-  }
-
+  select option{ background:#000; color:#fff; } /* non sempre rispettato dal browser */
   input{ flex:1; min-width:220px; }
   button{ cursor:pointer; }
   button:hover{ background:rgba(255,255,255,.09); }
 
+  /* STAGE + TRANSITION */
   .wrap{ position:relative; height: calc(100vh - 0px); width:100%; }
-  .content{
-    position:relative;
-    height: calc(100vh - 0px);
-  }
-
-  .fade-out .stage{ opacity:0; transform: translateY(10px); }
   .stage{
-    position:absolute;
-    inset: calc(14px + 0px);
+    position:relative;
     padding:16px;
-    opacity:1;
-    transform: translateY(0);
-    transition: opacity 420ms ease, transform 420ms ease;
   }
-
   .topline{
     display:flex; justify-content:space-between; align-items:baseline;
     gap:12px; padding:6px 6px 10px;
     color:rgba(243,244,247,.68); font-size:12px;
   }
-
   .field{
     position:relative;
-    height: calc(100% - 34px);
+    height: calc(100vh - 220px); /* abbastanza stabile con hero+header */
     border:1px solid var(--line);
     border-radius:22px;
     background: rgba(255,255,255,.02);
     overflow:hidden;
+    display:flex;
+    align-items:stretch;
+    justify-content:center;
   }
 
-  .tag{
-    position:absolute;
-    max-width: min(520px, 78vw);
-    padding:10px 12px;
-    border-radius:18px;
-    border:1px solid var(--chipLine);
-    background: var(--chip);
-    backdrop-filter: blur(8px);
-    box-shadow: 0 10px 40px rgba(0,0,0,.45);
-    user-select:none;
+  /* due “pagine” sovrapposte per animazione */
+  .pages{
+    position:relative;
+    width:100%;
+    height:100%;
   }
-  .tag .name{
-    color:var(--text);
+  .page{
+    position:absolute;
+    inset:0;
+    padding:18px;
+    display:grid;
+    gap:12px;
+    opacity:1;
+    transform: translateX(0);
+    transition: opacity 520ms ease, transform 520ms ease;
+  }
+  .page.out-left{ opacity:0; transform: translateX(-26px); }
+  .page.out-right{ opacity:0; transform: translateX(26px); }
+  .page.in-left{ opacity:0; transform: translateX(-26px); }
+  .page.in-right{ opacity:0; transform: translateX(26px); }
+
+  /* griglia responsive: desktop 4 colonne, tablet 2, mobile 1 */
+  .grid-4{ grid-template-columns: repeat(4, minmax(0, 1fr)); grid-auto-rows: 1fr; }
+  .grid-2{ grid-template-columns: repeat(2, minmax(0, 1fr)); grid-auto-rows: 1fr; }
+  .grid-1{ grid-template-columns: 1fr; grid-auto-rows: 1fr; }
+
+  .tile{
+    border:1px solid var(--tileLine);
+    background: var(--tile);
+    border-radius:18px;
+    padding:12px 12px 10px;
+    backdrop-filter: blur(8px);
+    box-shadow: 0 10px 40px rgba(0,0,0,.40);
+    overflow:hidden;
+  }
+  .name{
     font-weight:650;
     line-height:1.15;
-    font-size: clamp(14px, 4.2vw, 18px);
     letter-spacing:.2px;
+    font-size: clamp(14px, 2.2vw, 18px);
     white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
   }
-  /* LUOGO: piccolo + corsivo, senza icona */
-  .tag .place{
+  .place{
     margin-top:6px;
     color:rgba(243,244,247,.72);
-    font-size: clamp(11px, 3.4vw, 13px);
+    font-size: clamp(11px, 1.7vw, 13px);
     font-style: italic;
     white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
   }
@@ -183,7 +157,7 @@
   }
 
   @media (prefers-reduced-motion: reduce){
-    .stage{ transition:none; }
+    .page{ transition:none; }
   }
 </style>
 </head>
@@ -191,9 +165,8 @@
 
 <div class="hero">
   <div class="masthead">
-    <img class="logo"
-         alt="messaggeroveneto"
-         src="https://socialcomitalia.com/wp-content/uploads/2022/07/Loghi-giornali-1920-%C3%97-480-px-12.png">
+    <img class="logo" alt="messaggeroveneto"
+      src="https://socialcomitalia.com/wp-content/uploads/2022/07/Loghi-giornali-1920-%C3%97-480-px-12.png">
     <div class="brand">messaggeroveneto</div>
   </div>
   <h1>Mille vittime, tutti i nomi.</h1>
@@ -210,21 +183,23 @@
   <button id="reset" title="Azzera ricerca">Reset</button>
 </header>
 
-<div class="wrap" id="wrap">
-  <div class="stage" id="stage">
+<div class="wrap">
+  <div class="stage">
     <div class="topline">
       <div id="subtitle">Scorri per cambiare pagina</div>
       <div id="counter">—</div>
     </div>
-    <div class="field" id="field" aria-live="polite"></div>
+
+    <div class="field">
+      <div class="pages" id="pages"></div>
+    </div>
   </div>
 </div>
 
 <div class="hint">Scroll • Frecce ↑ ↓ • Touch swipe</div>
 
 <script>
-  const wrap = document.getElementById("wrap");
-  const field = document.getElementById("field");
+  const pagesEl = document.getElementById("pages");
   const counter = document.getElementById("counter");
   const subtitle = document.getElementById("subtitle");
 
@@ -236,16 +211,6 @@
   let VIEW = [];
   let page = 0;
 
-  // PAGE_SIZE responsive: desktop 12, tablet 8, mobile 5
-  function getPageSize(){
-    const w = window.innerWidth;
-    if (w <= 520) return 5;
-    if (w <= 900) return 8;
-    return 12;
-  }
-  let PAGE_SIZE = getPageSize();
-
-  function clamp(v,a,b){ return Math.max(a, Math.min(b, v)); }
   function escapeHtml(s){
     return (s ?? "").replace(/[&<>"']/g, c => ({
       "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
@@ -256,14 +221,16 @@
       .normalize("NFD").replace(/\p{Diacritic}/gu,"")
       .replace(/\s+/g," ").trim();
   }
-  function mulberry32(seed){
-    return function(){
-      let t = seed += 0x6D2B79F5;
-      t = Math.imul(t ^ (t >>> 15), t | 1);
-      t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
-      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
-    }
+  function clamp(v,a,b){ return Math.max(a, Math.min(b, v)); }
+
+  // responsive: definisce columns + page size
+  function getLayout(){
+    const w = window.innerWidth;
+    if (w <= 520) return { cols: 1, size: 5, cls: "grid-1" };   // mobile
+    if (w <= 900) return { cols: 2, size: 8, cls: "grid-2" };   // tablet (2x4)
+    return { cols: 4, size: 12, cls: "grid-4" };                // desktop (4x3)
   }
+  let LAYOUT = getLayout();
 
   function applyFilter(){
     const q = norm(qEl.value);
@@ -278,102 +245,80 @@
     }
 
     page = 0;
-    render();
+    renderPage("right"); // entra da destra
   }
 
-  function render(){
-    const totalPages = Math.max(1, Math.ceil(VIEW.length / PAGE_SIZE));
-    page = clamp(page, 0, totalPages - 1);
-
-    const start = page * PAGE_SIZE;
-    const slice = VIEW.slice(start, start + PAGE_SIZE);
-
-    counter.textContent =
-      `Pagina ${page+1}/${totalPages} • Nomi ${VIEW.length ? (start+1) : 0}-${Math.min(start+PAGE_SIZE, VIEW.length)} / ${VIEW.length}`;
-
-    field.innerHTML = "";
-
-    const W = field.clientWidth;
-    const H = field.clientHeight;
-
-    const pad = window.innerWidth <= 520 ? 28 : 24;
-
-    const seed = 13579 + page*99991 + norm(qEl.value).length*131 + (fieldSel.value.charCodeAt(0) || 0) + PAGE_SIZE*17;
-    const rand = mulberry32(seed);
-
-    const placed = [];
-    function overlaps(a,b){
-      return !(a.x+a.w < b.x || b.x+b.w < a.x || a.y+a.h < b.y || b.y+b.h < a.y);
-    }
-
-    const nodes = slice.map(r => {
-      const div = document.createElement("div");
-      div.className = "tag";
-      div.innerHTML = `
+  function makeTiles(slice){
+    return slice.map(r => `
+      <div class="tile">
         <div class="name">${escapeHtml(r.nome)} ${escapeHtml(r.cognome)}</div>
         <div class="place">${r.luogo ? escapeHtml(r.luogo) : ""}</div>
-      `;
-      const s = 0.95 + rand()*0.10;
-      div.style.transform = `scale(${s.toFixed(3)})`;
-      field.appendChild(div);
-      return div;
-    });
+      </div>
+    `).join("");
+  }
 
-    nodes.forEach(div => {
-      const rect = div.getBoundingClientRect();
-      const w = rect.width;
-      const h = rect.height;
+  function renderPage(direction){
+    // direction: "right" (avanti) o "left" (indietro)
+    const { size, cls } = LAYOUT;
+    const totalPages = Math.max(1, Math.ceil(VIEW.length / size));
+    page = clamp(page, 0, totalPages - 1);
 
-      let best = null;
-      for(let t=0;t<80;t++){
-        const x = pad + rand()*(W - 2*pad - w);
-        const y = pad + rand()*(H - 2*pad - h);
-        const cand = {x,y,w,h};
+    const start = page * size;
+    const slice = VIEW.slice(start, start + size);
 
-        let pen = 0;
-        for(const p of placed) if(overlaps(cand,p)) pen++;
+    counter.textContent =
+      `Pagina ${page+1}/${totalPages} • Nomi ${VIEW.length ? (start+1) : 0}-${Math.min(start+size, VIEW.length)} / ${VIEW.length}`;
 
-        if(best === null || pen < best.pen){
-          best = { ...cand, pen };
-          if(pen === 0) break;
-        }
-      }
+    const newPage = document.createElement("div");
+    newPage.className = `page ${cls} ` + (direction === "right" ? "in-right" : "in-left");
+    newPage.innerHTML = makeTiles(slice);
 
-      div.style.left = Math.max(pad, Math.min(W - pad - best.w, best.x)) + "px";
-      div.style.top  = Math.max(pad, Math.min(H - pad - best.h, best.y)) + "px";
-      placed.push(best);
-    });
+    const oldPage = pagesEl.querySelector(".page");
+
+    pagesEl.appendChild(newPage);
+
+    // forza reflow per far partire l’animazione
+    newPage.getBoundingClientRect();
+
+    // entra
+    newPage.classList.remove("in-right","in-left");
+
+    // esce il vecchio
+    if(oldPage){
+      oldPage.classList.add(direction === "right" ? "out-left" : "out-right");
+      // rimuovi dopo transizione
+      setTimeout(() => oldPage.remove(), 560);
+    }
   }
 
   function step(delta){
-    const totalPages = Math.max(1, Math.ceil(VIEW.length / PAGE_SIZE));
+    const { size } = LAYOUT;
+    const totalPages = Math.max(1, Math.ceil(VIEW.length / size));
     const next = clamp(page + delta, 0, totalPages - 1);
     if(next === page) return;
-
-    wrap.classList.add("fade-out");
-    setTimeout(() => {
-      page = next;
-      render();
-      requestAnimationFrame(() => wrap.classList.remove("fade-out"));
-    }, 220);
+    page = next;
+    renderPage(delta > 0 ? "right" : "left");
   }
 
+  // scroll pagina (debounce)
   let wheelLock = false;
   window.addEventListener("wheel", (e) => {
     e.preventDefault();
     if (wheelLock) return;
     wheelLock = true;
     step(e.deltaY > 0 ? 1 : -1);
-    setTimeout(() => wheelLock = false, 280);
+    setTimeout(() => wheelLock = false, 320);
   }, { passive:false });
 
+  // tastiera
   window.addEventListener("keydown", (e) => {
     if (e.key === "ArrowDown" || e.key === "PageDown" || e.key === " ") { e.preventDefault(); step(1); }
     if (e.key === "ArrowUp" || e.key === "PageUp") { e.preventDefault(); step(-1); }
-    if (e.key === "Home") { e.preventDefault(); page=0; render(); }
-    if (e.key === "End") { e.preventDefault(); page=999999; render(); }
+    if (e.key === "Home") { e.preventDefault(); page=0; renderPage("right"); }
+    if (e.key === "End")  { e.preventDefault(); page=999999; renderPage("right"); }
   });
 
+  // swipe
   let startY = null;
   window.addEventListener("touchstart", (e) => {
     if (!e.touches || !e.touches.length) return;
@@ -428,26 +373,27 @@
       qEl.focus();
     });
 
-    page = 0;
-    requestAnimationFrame(render);
+    renderPage("right");
 
+    // resize: aggiorna layout e mantiene il “punto” nell’elenco
     window.addEventListener("resize", () => {
-      const old = PAGE_SIZE;
-      const nw = getPageSize();
-      if (nw !== old){
-        const anchor = page * old;
-        PAGE_SIZE = nw;
-        page = Math.floor(anchor / PAGE_SIZE);
+      const old = LAYOUT;
+      const nw = getLayout();
+      if (nw.size !== old.size){
+        const anchor = page * old.size;
+        LAYOUT = nw;
+        page = Math.floor(anchor / LAYOUT.size);
+      } else {
+        LAYOUT = nw;
       }
-      requestAnimationFrame(render);
+      renderPage("right");
     });
   }
 
   load().catch(err => {
     console.error(err);
-    field.innerHTML = `<div class="tag" style="left:18px;top:18px;">
-      <div class="name">Errore nel caricamento</div>
-      <div class="place">Controlla che Morti_Terremoto.csv sia nella stessa cartella di index.html</div>
+    pagesEl.innerHTML = `<div class="page grid-1">
+      <div class="tile"><div class="name">Errore nel caricamento</div><div class="place">Controlla Morti_Terremoto.csv</div></div>
     </div>`;
     counter.textContent = "";
   });
