@@ -6,94 +6,97 @@
 <title>Memoriale – Terremoto del Friuli (1976)</title>
 <style>
   :root{
-    --bg:#ffffff;
-    --text:#12131a;
-    --muted:#5a6072;
-    --card:#ffffff;
-    --line:rgba(20,22,35,.12);
+    --bg:#0b0c10;
+    --text:#f3f4f7;
+    --muted:rgba(243,244,247,.72);
+    --line:rgba(255,255,255,.10);
   }
   html,body{height:100%;}
   body{
     margin:0;
+    background:var(--bg);
     color:var(--text);
     font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
     overflow:hidden;
-    background: var(--bg);
-    /* pattern leggero di omini (SVG inline, ripetuto) */
+
+    /* pattern: omini pieni bianchi, leggerissimi */
     background-image:
-      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 120 120'%3E%3Cg fill='none' stroke='%2312131a' stroke-opacity='.07' stroke-width='2'%3E%3Ccircle cx='30' cy='28' r='8'/%3E%3Cpath d='M18 56c2-12 22-12 24 0'/%3E%3Cpath d='M30 56v18'/%3E%3Cpath d='M30 74l-10 16'/%3E%3Cpath d='M30 74l10 16'/%3E%3Ccircle cx='90' cy='74' r='8'/%3E%3Cpath d='M78 102c2-12 22-12 24 0'/%3E%3Cpath d='M90 102v18'/%3E%3C/g%3E%3C/svg%3E");
-    background-size: 140px 140px;
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160' viewBox='0 0 160 160'%3E%3Cg fill='%23ffffff' fill-opacity='.06'%3E%3Cpath d='M46 40a12 12 0 1 0 0.01 0z'/%3E%3Cpath d='M46 56c-14 0-26 10-26 24v14c0 4 3 7 7 7h10v33c0 4 3 7 7 7s7-3 7-7v-33h10c4 0 7-3 7-7V80c0-14-12-24-26-24z'/%3E%3Cpath d='M118 98a10 10 0 1 0 0.01 0z'/%3E%3Cpath d='M118 112c-12 0-22 9-22 20v12c0 3 3 6 6 6h8v19c0 3 3 6 6 6s6-3 6-6v-19h8c3 0 6-3 6-6v-12c0-11-10-20-22-20z'/%3E%3C/g%3E%3C/svg%3E");
+    background-size: 190px 190px;
   }
 
   .wrap{
+    position:relative;
     height:100%;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    padding:18px;
+    width:100%;
   }
 
-  .panel{
-    width:min(980px, 100%);
-    background:rgba(255,255,255,.82);
-    backdrop-filter: blur(6px);
-    border:1px solid var(--line);
-    border-radius:22px;
-    box-shadow: 0 18px 70px rgba(0,0,0,.10);
-    padding:18px;
+  /* fade di pagina */
+  .fade-out .stage{
+    opacity:0;
+    transform: translateY(10px);
+  }
+  .stage{
+    position:absolute;
+    inset:0;
+    padding:22px;
     opacity:1;
     transform: translateY(0);
     transition: opacity 420ms ease, transform 420ms ease;
   }
 
-  .fade-out .panel{
-    opacity:0;
-    transform: translateY(8px);
-  }
-
+  /* barra alta minimale */
   .topbar{
     display:flex;
     justify-content:space-between;
     align-items:baseline;
     gap:12px;
-    padding:6px 6px 14px;
-  }
-  .title{
-    font-weight:650;
-    letter-spacing:.2px;
-    font-size:14px;
-    color:rgba(18,19,26,.72);
-  }
-  .counter{
-    font-size:12px;
-    color:rgba(18,19,26,.60);
-  }
-
-  .grid{
-    display:grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap:10px 16px;
-    padding:6px;
-  }
-  @media (min-width: 840px){
-    .grid{ grid-template-columns: repeat(3, minmax(0, 1fr)); }
-  }
-
-  .item{
-    border:1px solid var(--line);
-    border-radius:16px;
-    padding:12px 12px 10px;
-    background:rgba(255,255,255,.92);
-  }
-  .name{
-    font-weight:650;
-    line-height:1.15;
-    font-size:16px;
-  }
-  .place{
-    margin-top:6px;
+    padding:10px 10px 0;
     color:var(--muted);
     font-size:12px;
+    letter-spacing:.2px;
+  }
+
+  /* area dove spargiamo i nomi */
+  .field{
+    position:relative;
+    height: calc(100% - 60px);
+    margin-top: 10px;
+    border:1px solid var(--line);
+    border-radius:22px;
+    background: radial-gradient(900px 500px at 50% 0%, rgba(255,255,255,.06), transparent 60%),
+                rgba(0,0,0,.10);
+    overflow:hidden;
+  }
+
+  .tag{
+    position:absolute;
+    max-width: min(520px, 72vw);
+    padding:10px 12px;
+    border-radius:18px;
+    border:1px solid rgba(255,255,255,.10);
+    background: rgba(255,255,255,.04);
+    backdrop-filter: blur(6px);
+    box-shadow: 0 10px 40px rgba(0,0,0,.35);
+    user-select:none;
+  }
+  .tag .name{
+    color:var(--text);
+    font-weight:650;
+    line-height:1.15;
+    font-size: clamp(14px, 1.6vw, 18px);
+    letter-spacing:.2px;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+  }
+  .tag .place{
+    margin-top:6px;
+    color:rgba(243,244,247,.70);
+    font-size: clamp(11px, 1.2vw, 13px);
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
   }
 
   .hint{
@@ -102,21 +105,25 @@
     right:14px;
     bottom:12px;
     text-align:center;
-    color:rgba(18,19,26,.58);
+    color:rgba(243,244,247,.58);
     font-size:12px;
     pointer-events:none;
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    .stage{ transition:none; }
   }
 </style>
 </head>
 <body>
 
 <div class="wrap" id="wrap">
-  <div class="panel" id="panel">
+  <div class="stage" id="stage">
     <div class="topbar">
-      <div class="title">Memoriale – Vittime del terremoto del Friuli (1976)</div>
-      <div class="counter" id="counter">—</div>
+      <div id="title">Memoriale – Vittime del terremoto del Friuli (1976)</div>
+      <div id="counter">—</div>
     </div>
-    <div class="grid" id="grid"></div>
+    <div class="field" id="field" aria-live="polite"></div>
   </div>
 </div>
 
@@ -124,16 +131,32 @@
 
 <script>
   const wrap = document.getElementById("wrap");
-  const grid = document.getElementById("grid");
+  const stage = document.getElementById("stage");
+  const field = document.getElementById("field");
   const counter = document.getElementById("counter");
 
   let DATA = [];
   let page = 0;
 
-  // quanti nomi per “pagina”
-  const PAGE_SIZE = 12;
+  // quanti nomi “sparsi” per pagina
+  const PAGE_SIZE = 18;
 
   function clamp(v,a,b){ return Math.max(a, Math.min(b, v)); }
+  function escapeHtml(s){
+    return (s ?? "").replace(/[&<>"']/g, c => ({
+      "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
+    }[c]));
+  }
+
+  // RNG deterministico per avere una disposizione stabile per ogni pagina
+  function mulberry32(seed){
+    return function(){
+      let t = seed += 0x6D2B79F5;
+      t = Math.imul(t ^ (t >>> 15), t | 1);
+      t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    }
+  }
 
   function render(){
     const totalPages = Math.max(1, Math.ceil(DATA.length / PAGE_SIZE));
@@ -142,20 +165,76 @@
     const start = page * PAGE_SIZE;
     const slice = DATA.slice(start, start + PAGE_SIZE);
 
-    grid.innerHTML = slice.map(r => `
-      <div class="item">
+    counter.textContent = `Pagina ${page+1} / ${totalPages} • Nomi ${start+1}-${Math.min(start+PAGE_SIZE, DATA.length)} / ${DATA.length}`;
+
+    // pulisci e ricrea i “tag”
+    field.innerHTML = "";
+
+    // misure area
+    const pad = 18;
+    const W = field.clientWidth;
+    const H = field.clientHeight;
+
+    const rand = mulberry32(12345 + page * 99991);
+
+    // piazzamento “sparso” con tentativi per evitare sovrapposizioni grossolane
+    const placed = []; // rettangoli {x,y,w,h}
+    const triesPerItem = 50;
+
+    function overlaps(a,b){
+      return !(a.x+a.w < b.x || b.x+b.w < a.x || a.y+a.h < b.y || b.y+b.h < a.y);
+    }
+
+    // prima creiamo i nodi per misurarli
+    const nodes = slice.map((r, i) => {
+      const div = document.createElement("div");
+      div.className = "tag";
+      div.innerHTML = `
         <div class="name">${escapeHtml(r.n || "—")}</div>
         <div class="place">${r.l ? "📍 " + escapeHtml(r.l) : ""}</div>
-      </div>
-    `).join("");
+      `;
+      // piccola variazione di scala per “organicità”
+      const s = 0.95 + rand()*0.12; // 0.95–1.07
+      div.style.transform = `scale(${s.toFixed(3)})`;
+      field.appendChild(div);
+      return div;
+    });
 
-    counter.textContent = `Pagina ${page+1} / ${totalPages} • Nomi ${start+1}-${Math.min(start+PAGE_SIZE, DATA.length)} / ${DATA.length}`;
-  }
+    // poi posizioniamo
+    nodes.forEach((div) => {
+      const rect = div.getBoundingClientRect();
+      const w = rect.width;
+      const h = rect.height;
 
-  function escapeHtml(s){
-    return (s ?? "").replace(/[&<>"']/g, c => ({
-      "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
-    }[c]));
+      let best = null;
+
+      for(let t=0;t<triesPerItem;t++){
+        // distribuzione più densa al centro, ma comunque sparsa
+        const cx = 0.18 + rand()*0.64;
+        const cy = 0.18 + rand()*0.64;
+
+        const x = pad + cx*(W - 2*pad - w);
+        const y = pad + cy*(H - 2*pad - h);
+
+        const cand = {x, y, w, h};
+
+        // penalizza sovrapposizioni
+        let penalty = 0;
+        for(const p of placed){
+          if(overlaps(cand,p)) penalty += 1;
+        }
+        if(best === null || penalty < best.penalty){
+          best = { ...cand, penalty };
+          if(penalty === 0) break;
+        }
+      }
+
+      // applica
+      div.style.left = Math.max(pad, Math.min(W - pad - best.w, best.x)) + "px";
+      div.style.top  = Math.max(pad, Math.min(H - pad - best.h, best.y)) + "px";
+
+      placed.push(best);
+    });
   }
 
   function step(delta){
@@ -227,7 +306,7 @@
   }
 
   async function load(){
-    // NB: nel tuo repo il file si chiama Morti_Terremoto.csv
+    // nel tuo repo il file si chiama Morti_Terremoto.csv
     const res = await fetch("Morti_Terremoto.csv", { cache:"no-store" });
     const buf = await res.arrayBuffer();
     let text;
@@ -235,12 +314,14 @@
     catch { text = new TextDecoder("utf-8").decode(buf); }
     DATA = parseCSV(text);
     page = 0;
-    render();
+    // render dopo che il layout è pronto
+    requestAnimationFrame(render);
+    window.addEventListener("resize", () => requestAnimationFrame(render));
   }
 
   load().catch(err => {
     console.error(err);
-    grid.innerHTML = `<div class="item"><div class="name">Errore nel caricamento</div><div class="place">Controlla che Morti_Terremoto.csv sia nella stessa cartella di index.html</div></div>`;
+    field.innerHTML = `<div class="tag" style="left:18px;top:18px;"><div class="name">Errore nel caricamento</div><div class="place">Controlla che Morti_Terremoto.csv sia nella stessa cartella di index.html</div></div>`;
     counter.textContent = "";
   });
 </script>
